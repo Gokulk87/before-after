@@ -86,8 +86,7 @@ function addScripts(dir, scripts, dryRun) {
 
 export async function init({ cwd, dryRun = false, inGit = true }) {
   const say = (line = "") => console.log(line);
-  const verb = dryRun ? "would" : "";
-  const done = (what) => say(`  ✔ ${dryRun ? `would ${what}` : what}`);
+  const done = (did, wouldDo) => say(`  ✔ ${dryRun ? `would ${wouldDo}` : did}`);
   const project = detectProject(cwd);
   const pkg = readPackageJson(cwd);
   const manager = findLockfile(cwd)?.manager || "npm";
@@ -114,7 +113,7 @@ export async function init({ cwd, dryRun = false, inGit = true }) {
       if (result.status === "already") say(`  ✔ ${name} already uses the plugin`);
       else if (result.status === "changed") {
         if (!dryRun) fs.writeFileSync(project.viteConfig, result.source);
-        done(`added beforeAfter() to ${name}`);
+        done(`added beforeAfter() to ${name}`, `add beforeAfter() to ${name}`);
       } else {
         say(`  ! Couldn't edit ${name} safely (${result.reason}). Add these two lines yourself:`);
         say(`    ${IMPORT_LINE}`);
@@ -122,7 +121,7 @@ export async function init({ cwd, dryRun = false, inGit = true }) {
       }
     }
     const scripts = addScripts(cwd, { compare: "before-after" }, dryRun);
-    if (scripts.length) done(`added the script ${scripts.join(", ")} to package.json`);
+    if (scripts.length) done(`added the script ${scripts.join(", ")} to package.json`, `add the script ${scripts.join(", ")} to package.json`);
     steps.push(`Start your dev server as usual (restart it if it was running), e.g. ${run("dev")}`);
     steps.push(`In a second terminal: ${scripts.length || pkg?.scripts?.compare ? run("compare") : "npx before-after"}`);
   } else if (project.kind === "static") {
@@ -133,10 +132,10 @@ export async function init({ cwd, dryRun = false, inGit = true }) {
     else {
       const config = { build: false, ...(dist !== "." && { dist }) };
       if (!dryRun) fs.writeFileSync(path.join(cwd, "before-after.config.json"), `${JSON.stringify(config, null, 2)}\n`);
-      done(`wrote before-after.config.json ${JSON.stringify(config)}`);
+      done(`wrote before-after.config.json ${JSON.stringify(config)}`, `write before-after.config.json ${JSON.stringify(config)}`);
     }
     const scripts = addScripts(cwd, { "dev:compare": "before-after dev", compare: "before-after" }, dryRun);
-    if (scripts.length) done(`added the scripts ${scripts.join(", ")} to package.json`);
+    if (scripts.length) done(`added the scripts ${scripts.join(", ")} to package.json`, `add the scripts ${scripts.join(", ")} to package.json`);
     const hasScripts = scripts.length || pkg?.scripts?.["dev:compare"];
     if (!installed && pkg) steps.unshift(`Install the package (or keep using npx): ${installCmd}`);
     steps.push(`Serve your working copy with the pill: ${hasScripts ? run("dev:compare") : "npx before-after dev"}  (instead of your usual server)`);
@@ -164,6 +163,6 @@ export async function init({ cwd, dryRun = false, inGit = true }) {
   steps.push('Open your dev server and click "Compare" in the pill at the bottom, or press Alt+Shift+C.');
   steps.push('Compares against origin\'s default branch (or your last commit, with no remote). Another branch: --ref origin/<branch>. Backend at /api: --proxy /api=http://127.0.0.1:<port>.');
   say();
-  say(`Next${verb ? " (after a real run)" : ""}:`);
+  say(`Next${dryRun ? " (after a real run)" : ""}:`);
   steps.forEach((step, i) => say(`  ${i + 1}. ${step}`));
 }
