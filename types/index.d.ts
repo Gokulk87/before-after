@@ -18,9 +18,9 @@ export interface MountConfig {
   path: string;
   /** The app's folder, relative to the repo root. */
   dir: string;
-  /** Build command, run in `dir`. Default: the top-level `build`. */
-  build?: string;
-  /** Build output, relative to `dir`. Default "dist". */
+  /** Build command, run in `dir`, or false to serve the files as they are. Default: the app's "build" script, else false. */
+  build?: string | false;
+  /** What to serve, relative to `dir`. Default "dist", or "." with no build. */
   dist?: string;
   /** Extra environment variables for this build. */
   env?: Record<string, string>;
@@ -39,13 +39,13 @@ export interface BeforeAfterConfig {
   afterOrigin?: string;
   /** The app's folder, relative to the repo root. Default: the folder you run the CLI from. */
   dir?: string;
-  /** Build command, run in `dir`. Default "npm run build". */
-  build?: string;
-  /** Build output, relative to `dir`. Default "dist". */
+  /** Build command, run in `dir`, or false to serve the files as they are. Default: the "build" script, else false. */
+  build?: string | false;
+  /** What to serve, relative to `dir`. Default "dist", or "." with no build. */
   dist?: string;
   /** Extra environment variables for the build. */
   env?: Record<string, string>;
-  /** "ci": clean install from the lockfile (default). "link": reuse your checkout's node_modules. "none": skip. */
+  /** "ci": clean install from the lockfile (default). "link": reuse your checkout's node_modules. "none": skip (default with no build). */
   install?: "ci" | "link" | "none";
   /** Files copied from your checkout into the worktree before building. Default: .env and .env.local at the repo root and in `dir`. */
   copyFiles?: string[];

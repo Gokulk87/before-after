@@ -13,11 +13,28 @@ It's made for UI refactors, design-system migrations and visual reviews, where s
 
 <!-- TODO: add a GIF of the Compare view here -->
 
-## Quick start (Vite)
+## Quick start
 
 ```bash
 npm install --save-dev before-after-compare
+npx before-after init
 ```
+
+`init` works out what kind of project you have, sets it up, and prints the next steps. Use `--dry-run` to see what it would change first.
+
+| Your project | What `init` does | Then run |
+| --- | --- | --- |
+| **Vite app** | Adds `beforeAfter()` to `vite.config` and a `compare` script | `npm run dev`, and `npm run compare` in a second terminal |
+| **No build step** (plain HTML/CSS/JS) | Writes `before-after.config.json` with `"build": false`, plus `dev:compare` and `compare` scripts | `npm run dev:compare`, and `npm run compare` in a second terminal |
+| **Another dev server** (webpack, Next.js…) | Prints the two script tags to add in development, and the config to set | Your dev server, and `npx before-after` in a second terminal |
+
+Open your dev server and click **Compare** in the pill at the bottom of the page, or press <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd>.
+
+You need git: the "before" side is another commit. With no remote it's `HEAD`, so you compare your last commit with your uncommitted changes. Otherwise it's origin's default branch; pick another with `--ref origin/<branch>`.
+
+> **Using an AI coding assistant?** Point it at [AGENTS.md](AGENTS.md), which ships inside the package. It has the setup as numbered steps, so the assistant doesn't improvise its own server.
+
+### Vite by hand
 
 ```js
 // vite.config.js
@@ -29,38 +46,36 @@ export default defineConfig({
 });
 ```
 
-```bash
-npm run dev              # your branch, as usual (http://localhost:5173)
-npx before-after         # in a second terminal: builds origin/main and serves it on :5174
-```
-
-Open your dev server and click **Compare** in the pill at the bottom of the page, or press <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd>.
-
 The plugin only runs under `vite` / `vite dev`. A production build never includes it.
+
+### Sites with no build step
+
+`npx before-after dev [folder]` serves your working copy on `:5173` with the pill added to every page, in place of your usual static server. Reload to see edits. `npx before-after` serves your last commit (or `--ref`) the same way on `:5174`, because a project with no `build` script is served as it is. Set `"build": false` (or pass `--no-build`) to say so explicitly, and `"dist"` if your pages live in a subfolder such as `public`.
 
 ## How it works
 
 1. `npx before-after` checks out the ref as a detached `git worktree` under `~/.cache/before-after/`, outside your repo, so nothing in your checkout changes.
-2. It installs dependencies, runs your build there, and serves the output on `127.0.0.1:5174` with an SPA fallback. Paths you list under `proxy` go to your local backend, so both sides use the same API and data.
+2. It installs dependencies, runs your `build` script there (or serves the files as they are, when there's no build step), and serves the output on `127.0.0.1:5174`, with the pill on every HTML page and an SPA fallback. Paths you list under `proxy` go to your local backend, so both sides use the same API and data.
 3. It rebuilds only when the ref moves. Restarting is instant if nothing changed.
 4. Both servers inject the same small script. The Compare view loads each side in an iframe, and the two talk over `postMessage`. Messages are only accepted from the two dev servers' origins.
-
-With no git remote, the base is `HEAD`, so you compare your last commit with your uncommitted changes.
 
 ## CLI
 
 ```
-npx before-after [serve] [options]   build and serve the base ref (default)
+npx before-after init                set the project up; --dry-run to preview
+npx before-after [serve] [options]   build and serve the "before" ref on :5174 (default)
+npx before-after dev [folder]        serve a site with no build step, with the pill, on :5173
 npx before-after clean               remove the cached worktree
 
---ref <ref>            git ref to compare against (default: origin's default branch)
+--ref <ref>            git ref to compare against (default: origin's default branch, else HEAD)
 -p, --port <port>      port for the "before" server (default 5174)
 --host <host>          interface to listen on (default 127.0.0.1)
---after <origin>       your dev server (default http://localhost:5173)
+--after <origin>       your dev server (default http://localhost:5173); `dev` serves here
 --dir <path>           the app's folder, relative to the repo root (default: current folder)
---build <command>      build command, run in --dir (default "npm run build")
---dist <path>          build output, relative to --dir (default "dist")
---install <mode>       ci (clean install, default) | link (reuse your node_modules) | none
+--build <command>      build command, run in --dir (default: the "build" script, if there is one)
+--no-build             serve the files as they are (default with no "build" script)
+--dist <path>          what to serve, relative to --dir (default "dist", or "." with no build)
+--install <mode>       ci (clean install) | link (reuse your node_modules) | none
 --proxy <path>=<url>   forward a path prefix to your backend; repeatable
 --no-fetch             don't fetch the ref first
 --rebuild              build even if the ref hasn't moved
@@ -91,9 +106,10 @@ export default defineConfig({
 | `port` / `host` | `5174` / `127.0.0.1` | Where the "before" server listens |
 | `afterOrigin` | `http://localhost:5173` | Your dev server |
 | `dir` | folder you run the CLI from | The app's folder, relative to the repo root |
-| `build` / `dist` | `npm run build` / `dist` | Build command (run in `dir`) and its output (relative to `dir`) |
+| `build` | the `build` script, if there is one, else `false` | Build command, run in `dir`. `false` serves the files as they are |
+| `dist` | `dist`, or `.` with no build | What to serve, relative to `dir` |
 | `env` | `{}` | Extra environment variables for the build |
-| `install` | `"ci"` | `"ci"`: clean install from your lockfile (npm, pnpm, yarn or bun), redone only when the lockfile changes. `"link"`: reuse your checkout's `node_modules` (fast; see below). `"none"` |
+| `install` | `"ci"`, or `"none"` with no build | `"ci"`: clean install from your lockfile (npm, pnpm, yarn or bun), redone only when the lockfile changes. `"link"`: reuse your checkout's `node_modules` (fast; see below). `"none"` |
 | `copyFiles` | `.env`, `.env.local` at the root and in `dir` | Untracked files the build needs, copied into the worktree |
 | `proxy` | `{}` | Path prefix → backend URL. WebSockets are proxied too |
 | `mounts` | `[]` | More apps built from the same ref and served under a path (see below) |
@@ -135,12 +151,24 @@ export default defineConfig({
 
 ## Other dev servers
 
-The CLI side works with any static build. For the "after" side without Vite, serve `before-after-compare/client` (the file `src/client.js`) at `/__before-after/client.js` from your dev server, and add this before `</body>`:
+`npx before-after init` prints this for your project. The CLI side works with any static build. For the "after" side without Vite, serve `before-after-compare/client` (the file `src/client.js`) at `/__before-after/client.js` from your dev server, and add this before `</body>`:
 
 ```html
 <script>window.__BEFORE_AFTER__ = { role: "after", beforeOrigin: "http://localhost:5174" };</script>
 <script src="/__before-after/client.js"></script>
 ```
+
+## Troubleshooting
+
+Each message below is printed by `npx before-after`, with the fix.
+
+| Message | Fix |
+| --- | --- |
+| *…is running, but its page doesn't load the pill* | Vite: `npx before-after init`, then restart the dev server. No build step: use `npx before-after dev` instead of your own server |
+| *Port 5174 is already in use* | Another "before" server is running. Stop it, or use `--port 5175` and `beforeAfter({ beforeOrigin: "http://localhost:5175" })` |
+| *The build failed* | No build step: `--no-build`. Builds another way: `--build "<command>"`. Base branch has other dependencies: drop `--install link` |
+| *The build finished but there's no …/index.html* | Set `dist` to your build's output folder (e.g. `build`, `out`) |
+| *This folder isn't in a git repository* / *no commits yet* | `git init && git add -A && git commit -m "before"`, then make your changes |
 
 ## Limits
 

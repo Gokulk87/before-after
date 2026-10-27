@@ -14,10 +14,10 @@ export const DEFAULTS = {
   host: "127.0.0.1",
   afterOrigin: "http://localhost:5173",
   dir: undefined, // the app's folder, relative to the repo root; defaults to where you run the CLI
-  build: "npm run build",
-  dist: "dist", // relative to `dir`
+  build: undefined, // a command, or false for no build step; defaults to the "build" script if there is one
+  dist: undefined, // relative to `dir`; defaults to "dist", or "." with no build step
   env: {},
-  install: "ci", // "ci" | "link" | "none"
+  install: undefined, // "ci" | "link" | "none"; defaults to "ci", or "none" with no build step
   copyFiles: undefined, // defaults to .env / .env.local at the repo root and in `dir`, when they exist
   proxy: {},
   mounts: [],
@@ -37,6 +37,8 @@ const FLAGS = {
   proxy: { type: "string", multiple: true },
   config: { type: "string", short: "c" },
   "no-fetch": { type: "boolean" },
+  "no-build": { type: "boolean" },
+  "dry-run": { type: "boolean" },
   rebuild: { type: "boolean" },
   help: { type: "boolean", short: "h" },
   version: { type: "boolean", short: "v" },
@@ -57,11 +59,14 @@ export function parseProxyFlags(values = []) {
   return proxy;
 }
 
-/** Splits argv into a command ("serve" | "clean") and the flags as config keys. */
+export const COMMANDS = ["serve", "dev", "init", "clean"];
+
+/** Splits argv into a command (see COMMANDS), its folder argument, and the flags as config keys. */
 export function parseCli(argv) {
   const { values, positionals } = parseArgs({ args: argv, options: FLAGS, allowPositionals: true });
   const command = positionals[0] || "serve";
-  if (!["serve", "clean"].includes(command)) throw new Error(`Unknown command "${command}". Try --help.`);
+  if (!COMMANDS.includes(command)) throw new Error(`Unknown command "${command}". Try --help.`);
+  if (positionals.length > (command === "dev" ? 2 : 1)) throw new Error(`Unexpected argument "${positionals.at(-1)}". Try --help.`);
   const flags = {};
   if (values.ref) flags.ref = values.ref;
   if (values.port) {
@@ -72,12 +77,21 @@ export function parseCli(argv) {
   if (values.after) flags.afterOrigin = values.after;
   if (values.dir) flags.dir = values.dir;
   if (values.build) flags.build = values.build;
+  if (values["no-build"]) flags.build = false;
   if (values.dist) flags.dist = values.dist;
   if (values.install) flags.install = values.install;
   if (values.proxy) flags.proxy = parseProxyFlags(values.proxy);
   if (values["no-fetch"]) flags.fetch = false;
   if (values.rebuild) flags.rebuild = true;
-  return { command, flags, configPath: values.config, help: Boolean(values.help), version: Boolean(values.version) };
+  return {
+    command,
+    folder: command === "dev" ? positionals[1] : undefined,
+    flags,
+    configPath: values.config,
+    dryRun: Boolean(values["dry-run"]),
+    help: Boolean(values.help),
+    version: Boolean(values.version),
+  };
 }
 
 /** Defaults, then the file, then the flags. Objects (proxy, env, pill) merge key by key. */
@@ -95,7 +109,10 @@ export function mergeConfig(...layers) {
 }
 
 function validate(config) {
-  if (!["ci", "link", "none"].includes(config.install)) {
+  if (config.build !== undefined && config.build !== false && (typeof config.build !== "string" || !config.build.trim())) {
+    throw new Error(`build must be a command or false (no build step), got ${JSON.stringify(config.build)}`);
+  }
+  if (config.install !== undefined && !["ci", "link", "none"].includes(config.install)) {
     throw new Error(`install must be "ci", "link" or "none", got "${config.install}"`);
   }
   for (const [prefix, target] of Object.entries(config.proxy)) {
