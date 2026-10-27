@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings - Acme</title>
+<style>
+  body { margin: 0; font: 13px/1.35 Arial, Helvetica, sans-serif; color: #222; background: #fff; }
+  header { background: #e4e4e4; border-bottom: 1px solid #bbb; padding: 10px 16px; font-weight: bold; font-size: 15px; }
+  .app { display: flex; }
+  aside { width: 180px; padding: 12px 16px; border-right: 1px solid #ccc; min-height: calc(100vh - 40px); background: #f6f6f6; }
+  nav a { display: block; padding: 4px 0; color: #0645ad; }
+  nav a.on { font-weight: bold; color: #222; text-decoration: none; }
+  main { padding: 16px 24px; flex: 1; max-width: 760px; }
+  h1 { font-size: 22px; margin: 0 0 12px; }
+  fieldset { border: 1px solid #bbb; margin: 0 0 14px; padding: 10px 14px 14px; }
+  legend { font-weight: bold; padding: 0 4px; }
+  .avatar { width: 48px; height: 48px; background: #999; display: inline-block; vertical-align: middle; margin-right: 10px; }
+  label.field { display: block; margin: 10px 0 2px; }
+  input[type=text], input[type=email] { width: 260px; padding: 3px; border: 1px solid #999; font: inherit; }
+  button { font: inherit; padding: 3px 10px; }
+  .row { margin: 6px 0; }
+  progress { width: 300px; }
+  .danger legend { color: #c00; }
+</style>
+</head>
+<body>
+<header>ACME</header>
+<div class="app">
+  <aside>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Projects</a>
+      <a href="#">Team</a>
+      <a href="#" class="on">Settings</a>
+    </nav>
+  </aside>
+  <main>
+    <h1>Settings</h1>
+
+    <fieldset>
+      <legend>Profile</legend>
+      <div><span class="avatar"></span><button>Change photo</button></div>
+      <label class="field" for="name">Name</label><input id="name" type="text" value="Jamie Appleseed">
+      <label class="field" for="email">Email</label><input id="email" type="email" value="jamie@acme.dev">
+      <p><button>Save changes</button> <button>Cancel</button></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Notifications</legend>
+      <div class="row"><label><input type="checkbox" checked aria-label="Product updates"> Product updates</label></div>
+      <div class="row"><label><input type="checkbox" checked aria-label="Comments"> Comments</label></div>
+      <div class="row"><label><input type="checkbox" aria-label="Weekly digest"> Weekly digest</label></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Plan</legend>
+      <p>Pro plan. Renews 12/01.</p>
+      <progress value="68" max="100"></progress> 6800/10000 credits
+      <p><button>Upgrade</button></p>
+    </fieldset>
+
+    <fieldset class="danger">
+      <legend>Delete workspace</legend>
+      <p>This cannot be undone.</p>
+      <button>Delete workspace</button>
+    </fieldset>
+  </main>
+</div>
+</body>
+</html>

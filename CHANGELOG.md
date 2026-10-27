@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0
+
+- **Stacked** view: before on top, after below, for wide layouts.
+- **Swipe up and down** as well as left and right.
+- A redesigned pill and Compare window: a glass toolbar, segmented controls, line icons, light and dark mode, and animated layout changes. Captions above each pane replace the labels that covered the page, and the "before isn't running" state now shows the command with a Copy button.
+- The toolbar stays on one line down to about 820px wide (Sync and Mirror turn icon-only), and wraps neatly below that.
+- Opening Compare no longer puts focus in the route field.
+- The default accent is now `#007AFF`.
+- Compare remembers the view, width, swipe direction and Sync/Mirror toggles you last picked.
+- `init --dry-run` says "would write", not "would wrote".
+
 ## 0.2.0
 
 - `npx before-after init` detects the project and sets it up: adds the Vite plugin, writes the config for a site with no build step, or prints the script tags for another dev server.

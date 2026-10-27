@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings · Acme</title>
+<style>
+  :root { --bg: #fbfbfd; --card: #fff; --text: #1d1d1f; --muted: #6e6e73; --line: rgba(0,0,0,.08); --accent: #0071e3; --fill: #f2f2f5; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; letter-spacing: -.01em; }
+  .app { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+  aside { padding: 20px 14px; border-right: 1px solid var(--line); background: rgba(255,255,255,.7); }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 4px 10px 20px; font-weight: 600; }
+  .logo { width: 26px; height: 26px; border-radius: 8px; background: #1d1d1f; display: grid; place-items: center; color: #fff; font-size: 13px; }
+  nav a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-weight: 500; }
+  nav a.on { background: var(--fill); color: var(--text); }
+  nav svg { width: 16px; height: 16px; }
+  main { padding: 40px 56px 180px; max-width: 880px; }
+  h1 { font-size: 30px; letter-spacing: -.03em; margin: 0 0 4px; }
+  .lede { color: var(--muted); margin: 0 0 32px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
+  .card h2 { font-size: 16px; margin: 0 0 4px; letter-spacing: -.015em; }
+  .card p.sub { color: var(--muted); margin: 0 0 20px; font-size: 13px; }
+  .profile { display: flex; gap: 20px; align-items: center; margin-bottom: 20px; }
+  .avatar { width: 56px; height: 56px; border-radius: 50%; background: #e8e8ed; display: grid; place-items: center; font-weight: 600; font-size: 18px; color: #424245; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  label.field { display: grid; gap: 6px; font-size: 13px; font-weight: 500; }
+  input[type=text], input[type=email] { height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--fill); font: inherit; color: inherit; }
+  .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+  button { font: inherit; font-weight: 500; height: 36px; padding: 0 16px; border-radius: 999px; border: 0; cursor: pointer; }
+  .primary { background: var(--accent); color: #fff; }
+  .secondary { background: var(--fill); color: var(--text); }
+  .row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-top: 1px solid var(--line); }
+  .row:first-of-type { border-top: 0; }
+  .row small { display: block; color: var(--muted); font-size: 12.5px; }
+  .switch { position: relative; width: 42px; height: 26px; border-radius: 999px; background: #34c759; flex: none; }
+  .switch::after { content: ""; position: absolute; top: 2px; left: 18px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .switch.off { background: #e9e9ea; }
+  .switch.off::after { left: 2px; }
+  .meter { height: 8px; border-radius: 999px; background: var(--fill); overflow: hidden; margin: 12px 0 8px; }
+  .meter span { display: block; width: 68%; height: 100%; border-radius: 999px; background: var(--accent); }
+  .meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 12.5px; }
+  .danger h2 { color: #d70015; }
+  .ghost-danger { background: #fff1f0; color: #d70015; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand"><span class="logo">A</span>Acme</div>
+    <nav>
+      <a href="#"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 7 8 2.5 13.5 7v6.5h-11z"/></svg>Home</a>
+      <a href="#"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/><path d="M2.5 6.5h11"/></svg>Projects</a>
+      <a href="#"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="2.5"/><path d="M1.5 13c.6-2.3 2.3-3.5 4.5-3.5s3.9 1.2 4.5 3.5"/></svg>Team</a>
+      <a href="#" class="on"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.25"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"/></svg>Settings</a>
+    </nav>
+  </aside>
+  <main>
+    <h1>Settings</h1>
+    <p class="lede">Manage your profile, notifications and plan.</p>
+
+    <section class="card">
+      <h2>Profile</h2>
+      <p class="sub">This is how others see you across the workspace.</p>
+      <div class="profile"><span class="avatar">JA</span><button class="secondary">Change photo</button></div>
+      <div class="grid">
+        <label class="field">Name<input type="text" value="Jamie Appleseed"></label>
+        <label class="field">Email<input type="email" value="jamie@acme.dev"></label>
+      </div>
+      <div class="actions"><button class="secondary">Cancel</button><button class="primary">Save changes</button></div>
+    </section>
+
+    <section class="card">
+      <h2>Notifications</h2>
+      <p class="sub">Choose what reaches you, and where.</p>
+      <div class="row"><div>Product updates<small>New features and improvements</small></div><span class="switch" role="switch" aria-checked="true" aria-label="Product updates"></span></div>
+      <div class="row"><div>Comments<small>When someone replies to you</small></div><span class="switch" role="switch" aria-checked="true" aria-label="Comments"></span></div>
+      <div class="row"><div>Weekly digest<small>A summary every Monday</small></div><span class="switch off" role="switch" aria-checked="false" aria-label="Weekly digest"></span></div>
+    </section>
+
+    <section class="card">
+      <h2>Plan</h2>
+      <p class="sub">Pro · renews on 1 December</p>
+      <div class="meter"><span></span></div>
+      <div class="meta"><span>6,800 of 10,000 credits used</span><span>68%</span></div>
+      <div class="actions"><button class="primary">Upgrade</button></div>
+    </section>
+
+    <section class="card danger">
+      <h2>Delete workspace</h2>
+      <p class="sub">Permanently remove this workspace and all of its projects.</p>
+      <div class="actions" style="justify-content:flex-start"><button class="ghost-danger">Delete workspace</button></div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

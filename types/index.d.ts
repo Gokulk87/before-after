@@ -5,7 +5,7 @@ export interface PillOptions {
   afterLabel?: string;
   /** Shown after the "after" name in the pill. Default "working copy". */
   afterDetail?: string;
-  /** Any CSS color for the pill's buttons, swipe handle and highlights. Default "#2563eb". */
+  /** Any CSS color for the pill's buttons, swipe handle and highlights. Default "#007AFF". */
   accent?: string;
   /** Width presets in the Compare toolbar, in CSS px. Default [1440, 1024, 768, 390]. */
   widths?: number[];

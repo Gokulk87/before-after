@@ -103,6 +103,51 @@ try {
   await page.waitForFunction((origin) => [...document.querySelector("[data-before-after]").shadowRoot.querySelectorAll("iframe")].some((f) => f.src === `${origin}/second`), BEFORE);
   console.log("✔ Routes follow");
 
+  // Stacked: after below before, same width; the choice survives closing and reopening Compare.
+  const boxes = () =>
+    page.evaluate(() => {
+      const root = document.querySelector("[data-before-after]").shadowRoot;
+      const box = (side) => root.querySelector(`.pane.${side}`).getBoundingClientRect();
+      return { before: box("before"), after: box("after"), pressed: root.querySelector('button[data-mode][aria-pressed="true"]')?.dataset.mode };
+    });
+  const settle = () => page.waitForTimeout(600); // panes animate into place
+  await page.locator('[data-before-after] button[data-mode="stack"]').click();
+  await settle();
+  let layout = await boxes();
+  assert.equal(layout.pressed, "stack");
+  assert.ok(layout.after.top >= layout.before.bottom, "after sits below before");
+  assert.equal(Math.round(layout.after.left), Math.round(layout.before.left));
+  assert.equal(Math.round(layout.after.width), Math.round(layout.before.width));
+  await page.locator("[data-before-after] .close").click();
+  await page.locator("[data-before-after] .open-compare").click();
+  await settle();
+  layout = await boxes();
+  assert.equal(layout.pressed, "stack", "the view is remembered");
+  assert.ok(layout.after.top >= layout.before.bottom);
+  console.log("✔ Stacked view, remembered after reopening");
+
+  // Swipe up and down: a horizontal handle; dragging it moves the split.
+  await page.locator('[data-before-after] button[data-mode="swipe"]').click();
+  await page.locator('[data-before-after] button[data-axis="y"]').click();
+  await settle();
+  const swipe = () =>
+    page.evaluate(() => {
+      const root = document.querySelector("[data-before-after]").shadowRoot;
+      const handle = root.querySelector(".handle");
+      return { y: handle.classList.contains("y"), clip: root.querySelector(".pane.after").style.clipPath, box: root.querySelector(".knob").getBoundingClientRect() };
+    });
+  let s = await swipe();
+  assert.ok(s.y, "the handle runs across");
+  assert.match(s.clip, /^inset\(50%[ 0px]*\)$/, "before above the line, after below");
+  await page.mouse.move(s.box.x + s.box.width / 2, s.box.y + s.box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(s.box.x + s.box.width / 2, s.box.y - 150, { steps: 5 });
+  await page.mouse.up();
+  s = await swipe();
+  const percent = Number(/inset\(([\d.]+)%/.exec(s.clip)[1]);
+  assert.ok(percent < 40, `dragging up moves the split up (now ${percent}%)`);
+  console.log("✔ Swipe up and down");
+
   // A page on any other origin can embed the "before" app, but can't drive it.
   const { createServer } = await import("node:http");
   const OTHER = "http://localhost:5275";

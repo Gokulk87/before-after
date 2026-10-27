@@ -1,6 +1,6 @@
 {
   "name": "before-after-compare",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Compare your working copy with another git ref, live in the browser: side by side or swipe, with synced scroll, routes and mirrored clicks. Works with Vite apps and plain HTML sites; `npx before-after init` sets it up.",
   "type": "module",
   "license": "MIT",
@@ -59,11 +59,14 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
+    "gifenc": "^1.0.3",
+    "pngjs": "^7.0.0",
     "vite": "^6.4.5"
   },
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "test:e2e": "node test/smoke.mjs && node test/smoke-static.mjs",
-    "pack:check": "npm pack --dry-run"
+    "pack:check": "npm pack --dry-run",
+    "art": "node art/capture.mjs && node art/record.mjs"
   }
 }
