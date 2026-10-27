@@ -1,0 +1,33 @@
+{
+  "name": "before-after-compare",
+  "version": "0.1.0",
+  "description": "Compare your branch with another git ref, live in the browser: side by side or swipe, with synced scroll, routes and mirrored clicks. A Vite plugin plus a CLI.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Gokul Krishnan",
+  "keywords": ["vite", "vite-plugin", "visual-regression", "compare", "before-after", "diff", "ui-review", "design-system", "migration"],
+  "repository": { "type": "git", "url": "git+https://github.com/Gokulk87/before-after.git" },
+  "homepage": "https://github.com/Gokulk87/before-after#readme",
+  "bugs": "https://github.com/Gokulk87/before-after/issues",
+  "bin": { "before-after": "bin/cli.mjs" },
+  "exports": {
+    ".": { "types": "./types/index.d.ts", "default": "./src/config.mjs" },
+    "./vite": { "types": "./types/vite.d.ts", "default": "./src/vite.mjs" },
+    "./client": "./src/client.js",
+    "./package.json": "./package.json"
+  },
+  "types": "./types/index.d.ts",
+  "files": ["bin", "src", "types"],
+  "engines": { "node": ">=18.17" },
+  "peerDependencies": { "vite": ">=4" },
+  "peerDependenciesMeta": { "vite": { "optional": true } },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "vite": "^6.4.5"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "test:e2e": "node test/smoke.mjs",
+    "pack:check": "npm pack --dry-run"
+  }
+}
